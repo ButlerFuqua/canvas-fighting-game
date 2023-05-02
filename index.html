@@ -6,11 +6,31 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fighting Game</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+    </style>
+
 </head>
 
 <body>
 
-    <canvas></canvas>
+    <div style="position: relative; display: inline-block;">
+        <div style="position: absolute; top: 0; left: 0; display: flex; width: 100%; align-items: center; padding: 20px;">
+            <!-- Player health -->
+            <div style="background: coral; height: 30px; width: 100%;"></div>
+            <!-- Timer -->
+            <div style="background: red; width: 100px; height: 100px; flex-shrink: 0;"></div>
+            <!-- Enemy health -->
+            <div style="position: relative; height: 30px; width: 100%;">
+                <div id="enemyHealth" style="background: coral; height: 30px;"></div>
+                <div style="background: 'blue'; position: absolute;"></div>
+            </div>
+        </div>
+        <canvas></canvas>
+    </div>
 
     <script src="/index.js""></script>
 

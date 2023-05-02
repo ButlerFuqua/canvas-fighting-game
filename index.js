@@ -161,6 +161,7 @@ function animate() {
     ) {
         player.isAttacking = false
         console.log('ATTACK ENEMY!')
+        document.getElementById('enemyHealth').style.width = '20%'
     }
     if (
         rectangularCollision({ rect1: enemy, rect2: player }) &&
