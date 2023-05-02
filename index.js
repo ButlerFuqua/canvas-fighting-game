@@ -35,12 +35,12 @@ class Sprite {
         c.fillRect(spriteX, spriteY, this.width, this.height)
 
         // attackBox
-        // if (this.isAttacking) {
-        const { x: attackX, y: attackY } = this.attackBox.position;
-        const { width: attackW, height: attackH } = this.attackBox
-        c.fillStyle = 'green'
-        c.fillRect(attackX, attackY, attackW, attackH)
-        // }
+        if (this.isAttacking) {
+            const { x: attackX, y: attackY } = this.attackBox.position;
+            const { width: attackW, height: attackH } = this.attackBox
+            c.fillStyle = 'green'
+            c.fillRect(attackX, attackY, attackW, attackH)
+        }
     }
 
     update() {
@@ -173,7 +173,6 @@ function animate() {
 animate()
 
 window.addEventListener('keydown', (event) => {
-    console.log(event.key)
     const jumpSpeed = 20;
     // Player
     switch (event.key) {
@@ -213,7 +212,6 @@ window.addEventListener('keydown', (event) => {
 })
 
 window.addEventListener('keyup', (event) => {
-    console.log(event.key)
     // Player
     switch (event.key) {
         case 'd':
