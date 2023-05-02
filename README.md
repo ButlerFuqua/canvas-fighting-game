@@ -1,0 +1,1 @@
+A classic fighting arcade game built with Vanilla JavaScript and the Canvas API.
