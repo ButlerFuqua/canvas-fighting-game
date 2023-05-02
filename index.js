@@ -10,22 +10,24 @@ c.fillRect(0, 0, canvas.width, canvas.height)
 const gravity = .7;
 
 class Sprite {
-    constructor({ position, velocity }) {
+    constructor({ position, velocity, color = 'red' }) {
         this.position = position
         this.velocity = velocity
-        this.height = 150;
+        this.height = 150
+        this.width = 50
         this.lastKey
         this.attackBox = {
             position: this.position,
             width: 100,
             height: 50,
         }
+        this.color = color
     }
 
     draw() {
         const { x: spriteX, y: spriteY } = this.position
-        c.fillStyle = 'red'
-        c.fillRect(spriteX, spriteY, 50, 150)
+        c.fillStyle = this.color
+        c.fillRect(spriteX, spriteY, this.width, this.height)
 
         // attackBox
         const { x: attackX, y: attackY } = this.attackBox.position;
@@ -66,7 +68,8 @@ const enemy = new Sprite({
     velocity: {
         x: 0,
         y: 0,
-    }
+    },
+    color: 'blue',
 })
 
 const keys = {
@@ -100,6 +103,8 @@ function animate() {
     enemy.update()
 
     const speed = 5;
+
+    // Player movement
     player.velocity.x = 0
     if (keys.a.pressed && player.lastKey === 'a') {
         player.velocity.x = -(speed)
@@ -107,11 +112,23 @@ function animate() {
         player.velocity.x = speed
     }
 
+    // Enemy movement
     enemy.velocity.x = 0
     if (keys.ArrowLeft.pressed && enemy.lastKey === 'ArrowLeft') {
         enemy.velocity.x = -(speed)
     } else if (keys.ArrowRight.pressed && enemy.lastKey === 'ArrowRight') {
         enemy.velocity.x = speed
+    }
+
+    // Detect for collision
+    if (
+        player.attackBox.position.x + player.attackBox.width >= enemy.position.x &&
+        player.attackBox.position.x <= enemy.position.x + enemy.width &&
+
+        player.attackBox.position.y + player.attackBox.height >= enemy.position.y &&
+        player.attackBox.position.y + player.attackBox.height <= enemy.position.y + enemy.height
+    ) {
+        console.log('ATTACK!')
     }
 }
 animate()
