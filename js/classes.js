@@ -1,5 +1,5 @@
 class Sprite {
-    constructor({ position, imgSrc, scale = 1, framesMax = 1 }) {
+    constructor({ position, imgSrc, scale = 1, framesMax = 1, offset = { x: 0, y: 0 } }) {
         this.position = position
         this.scale = scale
         this.height = 150
@@ -10,6 +10,7 @@ class Sprite {
         this.framesCurrent = 0
         this.framesElapsed = 0
         this.framesHold = 10
+        this.offset = offset
     }
 
     draw() {
@@ -23,8 +24,8 @@ class Sprite {
             this.image.height,
 
             // position
-            this.position.x,
-            this.position.y,
+            this.position.x - this.offset.x,
+            this.position.y - this.offset.y,
 
             // size
             (this.image.width / this.framesMax) * this.scale,
@@ -32,11 +33,8 @@ class Sprite {
         )
     }
 
-    update() {
-        this.draw()
-
+    animateFrames() {
         this.framesElapsed++
-
         if (this.framesElapsed % this.framesHold === 0) {
             // - 1 to avoid flicker by animating static images created by sprite class (like background)
             if (this.framesCurrent < this.framesMax - 1) {
@@ -46,9 +44,31 @@ class Sprite {
             }
         }
     }
+
+    update() {
+        this.draw()
+        this.animateFrames()
+    }
 }
-class Fighter {
-    constructor({ position, velocity, color = 'red', offset }) {
+class Fighter extends Sprite {
+    constructor({
+        position,
+        velocity,
+        color = 'red',
+        offset,
+        imgSrc,
+        scale = 1,
+        framesMax = 1
+    }) {
+
+        super({
+            position,
+            imgSrc,
+            scale,
+            framesMax,
+            offset
+        })
+
         this.position = position
         this.velocity = velocity
         this.height = 150
@@ -66,24 +86,15 @@ class Fighter {
         this.color = color
         this.isAttacking = false
         this.health = 100
-    }
-
-    draw() {
-        const { x: spriteX, y: spriteY } = this.position
-        c.fillStyle = this.color
-        c.fillRect(spriteX, spriteY, this.width, this.height)
-
-        // attackBox
-        if (this.isAttacking) {
-            const { x: attackX, y: attackY } = this.attackBox.position;
-            const { width: attackW, height: attackH } = this.attackBox
-            c.fillStyle = 'green'
-            c.fillRect(attackX, attackY, attackW, attackH)
-        }
+        this.framesCurrent = 0
+        this.framesElapsed = 0
+        this.framesHold = 10
     }
 
     update() {
         this.draw()
+        this.animateFrames()
+
         this.attackBox.position.x = this.position.x + this.attackBox.offset.x
         this.attackBox.position.y = this.position.y + this.attackBox.offset.y
 
