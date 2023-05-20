@@ -9,23 +9,64 @@ c.fillRect(0, 0, canvas.width, canvas.height)
 
 const gravity = .7;
 
-const background = new Sprite({
-    position: {
-        x: 0,
-        y: 0,
-    },
-    imgSrc: './assets/background.png'
-})
-const shop = new Sprite({
-    position: {
-        x: 620,
-        y: 128,
-    },
-    imgSrc: './assets/shop.png',
-    scale: 2.75,
-    framesMax: 6
-})
-const player = new Fighter({
+class Sprite {
+    constructor({ position, velocity, color = 'red', offset }) {
+        this.position = position
+        this.velocity = velocity
+        this.height = 150
+        this.width = 50
+        this.lastKey
+        this.attackBox = {
+            position: {
+                x: this.position.x,
+                y: this.position.y
+            },
+            offset,
+            width: 100,
+            height: 50,
+        }
+        this.color = color
+        this.isAttacking = false
+        this.health = 100
+    }
+
+    draw() {
+        const { x: spriteX, y: spriteY } = this.position
+        c.fillStyle = this.color
+        c.fillRect(spriteX, spriteY, this.width, this.height)
+
+        // attackBox
+        if (this.isAttacking) {
+            const { x: attackX, y: attackY } = this.attackBox.position;
+            const { width: attackW, height: attackH } = this.attackBox
+            c.fillStyle = 'green'
+            c.fillRect(attackX, attackY, attackW, attackH)
+        }
+    }
+
+    update() {
+        this.draw()
+        this.attackBox.position.x = this.position.x + this.attackBox.offset.x
+        this.attackBox.position.y = this.position.y + this.attackBox.offset.y
+
+
+        this.position.x += this.velocity.x
+        this.position.y += this.velocity.y
+
+        if (this.position.y + this.height + this.velocity.y >= canvas.height) {
+            this.velocity.y = 0;
+        } else {
+            this.velocity.y += gravity;
+        }
+    }
+
+    attack() {
+        this.isAttacking = true;
+        setTimeout(() => this.isAttacking = false, 100)
+    }
+}
+
+const player = new Sprite({
     position: {
         x: 0,
         y: 0,
@@ -37,17 +78,10 @@ const player = new Fighter({
     offset: {
         x: 0,
         y: 0
-    },
-    imgSrc: './assets/samuraiMack/idle.png',
-    framesMax: 8,
-    scale: 2.5,
-    offset: {
-        x: 215,
-        y: 157
     }
 })
 
-const enemy = new Fighter({
+const enemy = new Sprite({
     position: {
         x: 400,
         y: 100
@@ -86,16 +120,52 @@ const keys = {
     },
 }
 
+function rectangularCollision({ rect1, rect2 }) {
+    return (
+        rect1.attackBox.position.x + rect1.attackBox.width >= rect2.position.x &&
+        rect1.attackBox.position.x <= rect2.position.x + rect2.width &&
+
+        rect1.attackBox.position.y + rect1.attackBox.height >= rect2.position.y &&
+        rect1.attackBox.position.y + rect1.attackBox.height <= rect2.position.y + rect2.height
+    )
+}
+
+function showWinner({ player1, player2, timerId }) {
+    clearTimeout(timerId)
+    const displayTextDiv = document.getElementById('displayText');
+    if (player1.health === player2.health) {
+        displayTextDiv.innerHTML = 'Tie';
+    }
+    if (player1.health > player2.health) {
+        displayTextDiv.innerHTML = 'Player One Wins!';
+    }
+    if (player2.health > player1.health) {
+        displayTextDiv.innerHTML = 'Player Two Wins!';
+    }
+    displayTextDiv.style.display = 'flex';
+}
+
+let timer = 60
+let timerId
+function decreaseTimer() {
+    if (timer > 0) {
+        timerId = setTimeout(decreaseTimer, 1000)
+        timer--
+        document.getElementById('timer').innerHTML = timer;
+    }
+
+    if (timer === 0) {
+        showWinner({ player1: player, player2: enemy, timerId })
+    }
+}
 decreaseTimer();
 
 function animate() {
     window.requestAnimationFrame(animate)
     c.fillStyle = 'black'
     c.fillRect(0, 0, canvas.width, canvas.height)
-    background.update()
-    shop.update()
     player.update()
-    // enemy.update()
+    enemy.update()
 
     const speed = 5;
 
